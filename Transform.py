@@ -67,4 +67,8 @@ def align_x_y_theta(df, component, condition, status):
 
     resultDf = pd.concat(frames)
     
+    resultDf['SN'] = resultDf['SN'].str.replace('____', '')
+    
     return resultDf
+
+
