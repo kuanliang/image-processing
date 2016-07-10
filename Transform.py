@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 
-
+from DataIO import csvToDf
+import os
 
 def align_x_y_theta(df, component, condition, status):
     '''align x, y and theta records and add necessary columns
@@ -72,3 +73,19 @@ def align_x_y_theta(df, component, condition, status):
     return resultDf
 
 
+def combine_df(path, tag):
+    dfList = csvToDf(path)
+
+    frames = []
+    for df, fileName in dfList:
+        # print fileName
+        fileItems = os.path.splitext(fileName)[0].split('_')
+        status = fileItems[0]
+        component = '_'.join(fileItems[2:])
+        condition = tag
+    
+        dfAligned = align_x_y_theta(df, component, condition, status)
+        frames.append(dfAligned)
+    
+    finalDf = pd.concat(frames)
+    return finalDf
