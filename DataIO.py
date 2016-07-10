@@ -11,3 +11,5 @@ def csvToDf(path):
             path = './tear/' + excelfile
             dfList.append((pd.read_csv(path, sep=';'), excelfile))
     return dfList
+
+
