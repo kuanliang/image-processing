@@ -168,6 +168,7 @@ def create_ML_df(df):
     
     '''
     condiDfList = []
+    df['comp_metric'] = df['component'] + '_' + df['metric']
     for groupCondi in df.groupby('condition'):
         SNDfList = []
         for groupSN in groupCondi[1].groupby('SN'):
