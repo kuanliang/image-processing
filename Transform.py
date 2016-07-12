@@ -5,6 +5,8 @@ from DataIO import csvToDf
 import os
 import math
 
+
+
 def align_x_y_theta(df, component, condition, status):
     '''align x, y and theta records and add necessary columns
     
@@ -89,6 +91,18 @@ def combine_df(path, tag):
         frames.append(dfAligned)
     
     finalDf = pd.concat(frames)
+    
+    # transform column value1 ~ value32 to numeric (some theta are objects)
+    finalDf[['value{}'.format(x) for x in range(1,33)]] = finalDf[['value{}'.format(x) for x in range(1,33)]]\
+                                                          .apply(pd.to_numeric)
+    
+    # add absolute 
+    finalDfThetaCopy = finalDf[finalDf['metric'] == 'theta'].copy()
+    finalDfThetaCopy[['value{}'.format(x) for x in range(1,33)]] = finalDfThetaCopy[['value{}'.format(x) for x in range(1,33)]].apply(np.abs)
+    finalDfThetaCopy['metric'] = 'thetaAbs'
+    # append to finalDf
+    finalDf = pd.concat([finalDf, finalDfThetaCopy])
+    
     return finalDf
     
     
@@ -140,3 +154,40 @@ def lineup(df, **kwargv):
     for key in kwargv.keys():
         finalDf[key] = kwargv[key]
     return finalDf
+    
+    
+    
+def create_ML_df(df):
+    '''create dataframe for Machine Learning modeling
+    
+    Notes:
+    
+    Args: a dataframe from combine_df result
+    
+    Returns: a dataframe in matrix format for ML modeling
+    
+    '''
+    condiDfList = []
+    for groupCondi in df.groupby('condition'):
+        SNDfList = []
+        for groupSN in groupCondi[1].groupby('SN'):
+            columns = groupSN[1]['comp_metric']
+            SN = groupSN[0]
+            dfList = []
+            for i in range(1, 33):
+                record = groupSN[1][['value{}'.format(i)]].T
+                record.columns = columns
+                record.index = ['{}_{}'.format(SN, i)]
+                dfList.append(record)
+            tempDf = pd.concat(dfList)
+
+            SNDfList.append(tempDf)
+        SNAllDf = pd.concat(SNDfList)
+        SNAllDf['label'] = groupCondi[0]
+        condiDfList.append(SNAllDf)
+    mlDf = pd.concat(condiDfList)
+    
+    return mlDf
+    
+    
+    
