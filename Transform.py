@@ -3,6 +3,7 @@ import numpy as np
 
 from DataIO import csvToDf
 import os
+import math
 
 def align_x_y_theta(df, component, condition, status):
     '''align x, y and theta records and add necessary columns
@@ -88,4 +89,54 @@ def combine_df(path, tag):
         frames.append(dfAligned)
     
     finalDf = pd.concat(frames)
+    return finalDf
+    
+    
+def lineup(df, tag):
+    dfFrames = []
+    for sn in df['SN']:
+        snDf = df[df['SN'] == sn].iloc[:,1:33].T
+    
+        snDf['SN'] = sn
+        snDf.rename(columns={snDf.columns[0]:'value'}, inplace=True)
+        snDf.index = range(len(snDf))
+        dfFrames.append(snDf)
+    finalDf = pd.concat(dfFrames)
+    finalDf['metric'] = tag
+    return finalDf
+    
+    
+def create_zDf(df):
+    dfList = []
+    for group in df.groupby('SN'):
+        for comGroup in group[1].groupby('component'):
+            SN = comGroup[1]['SN'].value_counts().index[0]
+            condition = comGroup[1]['condition'].value_counts().index[0]
+            component = comGroup[1]['component'].value_counts().index[0]
+            status = comGroup[1]['status'].value_counts().index[0]
+            xDf = comGroup[1][comGroup[1]['metric'] == 'x'].iloc[:,1:33]
+            yDf = comGroup[1][comGroup[1]['metric'] == 'y'].iloc[:,1:33]
+            zDf = ((((xDf**2)+(yDf**2)).apply(math.sqrt)).to_frame()).T
+            zDf['SN'] = SN
+            zDf['condition'] = condition
+            zDf['component'] = component
+            zDf['status'] = status
+            zDf['metric'] = 'z'
+            dfList.append(zDf)
+    zDiffDf = pd.concat(dfList)
+    
+    return zDiffDf
+    
+def lineup(df, **kwargv):
+    dfFrames = []
+    for sn in df['SN']:
+        snDf = df[df['SN'] == sn][['value{}'.format(x) for x in range(1,33)]].T
+    
+        snDf['SN'] = sn
+        snDf.rename(columns={snDf.columns[0]:'value'}, inplace=True)
+        snDf.index = range(len(snDf))
+        dfFrames.append(snDf)
+    finalDf = pd.concat(dfFrames)
+    for key in kwargv.keys():
+        finalDf[key] = kwargv[key]
     return finalDf
