@@ -191,6 +191,12 @@ def create_ML_df(df):
     
     return mlDf
 
+def addZDf(df):
+    '''return 
+    '''
+    zDiffDf = create_zDf(df)
+    return pd.concat([df, zDiffDf])
+    
 
 
 
