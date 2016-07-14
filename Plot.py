@@ -8,6 +8,8 @@ from sklearn.metrics import confusion_matrix
 
 import matplotlib.pyplot as plt
 
+import numpy as np
+
 
 def plot_box(df, component):
     dfComp = df[df['component'] == component]
@@ -129,19 +131,19 @@ def plot_confusion_matrix(true, predict, title='Confusion matrix', cmap=plt.cm.B
     tempCm = np.append(tempCm,
                        [np.round(cm[2].astype(float)/cm.sum(axis=1)[2], 2)],axis=0)
     cm=tempCm.copy()
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.imshow(cm[1:3], interpolation='nearest', cmap=cmap)
     plt.title(title, size=20)
     plt.colorbar()
     tick_marks = np.arange(3)
-    plt.xticks(tick_marks, ['drop', 'duplicate', 'tear'], rotation=45, size=20)
-    plt.yticks(tick_marks, ['drop', 'duplicate', 'tear'], size=20)
+    plt.xticks(tick_marks, [u"drop", u"Normal", u"Tear"], rotation=45, size=20)
+    plt.yticks(tick_marks, [u"Normal", u"Tear"], size=20)
     plt.tight_layout()
-    plt.ylabel('True label', size=20)
-    plt.xlabel('Predicted label', size=20)
+    plt.ylabel(u"Actual class", size=20)
+    plt.xlabel(u"Predicted class", size=20)
     ax = plt.gca()
     ax.grid(False)
-    for i in range(3):
+    for i in range(1,3):
         for j in range(3):
             if cm[i][j] != 0:
-                ax.text(j, i, '{}\n({})'.format(cm[i][j], cmReal[i][j]), fontsize=15)
+                ax.text(j, i-1, '{}\n({})'.format(cm[i][j], cmReal[i][j]), fontsize=15)
     
