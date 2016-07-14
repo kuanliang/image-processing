@@ -6,6 +6,12 @@ from sklearn import cross_validation
 from sklearn import grid_search
 from sklearn.metrics import classification, confusion_matrix
 
+
+import re
+import random
+import pandas as pd
+import numpy as np
+
 def logistic(X, y, random_state=0):
     
     pipe = Pipeline(
@@ -33,13 +39,35 @@ def logistic(X, y, random_state=0):
     return gs_cv
     
 
+def train_test_split(df, trainRatio=0.6, testRatio=0.4):
+    '''split training and testing data according to 3 cases (drop, duplicate, tear)
+    
+    Notes: the dictionary comprehension is a bit complex, but here are just 3 steps
+    
+    Args: ML DataFrame
+    
+    Return: 
+        labelSNDictTrain: 
+    
+    '''
+    
+    # extract SN of each cases
+    labelSNDict = {label: list(set([re.sub('_\d+', '', x) for x in df[df['label'] == label].index]))\
+    for label in ['drop', 'duplicate', 'tear']}
+    # extract SN for training case of each label
+    labelSNDictTrain = {label: random.sample(labelSNDict[label], int(len(labelSNDict[label])*trainRatio))\
+    for label in ['drop', 'duplicate', 'tear']}
 
-
-
-
-
-
-
+    # extract training dataframes
+    dropTrainDf = pd.concat([df[df.index.str.contains(SN)] for SN in labelSNDictTrain['drop']])
+    duplicateTrainDf = pd.concat([df[df.index.str.contains(SN)] for SN in labelSNDictTrain['duplicate']])
+    tearTrainDf = pd.concat([df[df.index.str.contains(SN)] for SN in labelSNDictTrain['tear']])
+    
+    trainDf = pd.concat([dropTrainDf, duplicateTrainDf, tearTrainDf])
+    testDf = df.loc[list(set(df.index) - set(df.index))]
+    
+    
+    return trainDf, testDf
 
 
 
