@@ -2,6 +2,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import Imputer, RobustScaler
 from sklearn import linear_model
 from sklearn.svm import SVC
+from sklearn import tree
 from sklearn import cross_validation
 from sklearn import grid_search
 from sklearn.metrics import classification, confusion_matrix
@@ -68,6 +69,33 @@ def SVMModeling(dfTrain, dfTest, random_state=0):
         'clf__gamma': (1, 1e-1, 1e-2, 1e-3, 1e-4),
         'clf__tol': (1e-2, 1e-3, 1e-4, 1e-5)
     }
+    gs_cv = grid_search.GridSearchCV(pipe, param_grid, scoring='f1_weighted')
+    
+    X_train, y_train = dfTrain.iloc[:, 0:-1], dfTrain.iloc[:,-1]
+    X_test, y_test = dfTest.iloc[:, 0:-1], dfTest.iloc[:, -1]
+    
+    gs_cv.fit(X_train, y_train)
+    
+    y_predict = gs_cv.predict(X_test)
+    
+    return gs_cv, (y_test, y_predict)
+
+
+def DTModeling(dfTrain, dfTest):
+    pipe = Pipeline([
+        #('union', InitialProcessor(colInfo=colInfo)),
+        ('impute', Imputer(missing_values = 'NaN', strategy = 'median', axis = 1)),
+        # ('scaler', RobustScaler()),
+        #('clf', linear_model.SGDClassifier(loss = 'log', penalty='l1', class_weight='balanced', n_iter=1))
+        # ('pca', pca)
+        ('clf', tree.DecisionTreeClassifier())
+    ])  
+
+    param_grid = {
+        'clf__criterion': ['gini', 'entropy'],
+        'clf__max_depth': [3, 4, 5, 6, 7],
+        'clf__min_samples_split': [2, 3, 4, 5, 6, 7,  8, 9, 10, 12, 15, 20, 25, 30, 35, 40]}
+                  
     gs_cv = grid_search.GridSearchCV(pipe, param_grid, scoring='f1_weighted')
     
     X_train, y_train = dfTrain.iloc[:, 0:-1], dfTrain.iloc[:,-1]
