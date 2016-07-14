@@ -4,6 +4,10 @@ from Transform import lineup
 import pandas as pd
 from bokeh.plotting import figure, show, output_file
 from bokeh.io import output_notebook
+from sklearn.metrics import confusion_matrix
+
+import matplotlib.pyplot as plt
+
 
 def plot_box(df, component):
     dfComp = df[df['component'] == component]
@@ -101,3 +105,43 @@ def plot_all_box(df, component, labelList, outliers=True, **labelFilter):
     #p.add_tools(HoverTool())
     # output_file("condition.html")
     show(p)
+    
+def plot_confusion_matrix(true, predict, title='Confusion matrix', cmap=plt.cm.Blues, size=24):
+    '''plot confusion matrix according to true and predict values
+    
+    Note:
+    
+    Args:
+        true
+        predict
+        title
+        comp
+        size
+    
+    Return: None
+    
+    '''
+    
+    cm = confusion_matrix(true, predict)
+    cmReal = cm.copy()
+    tempCm = np.append([np.round(cm[0].astype(float)/cm.sum(axis=1)[0], 2)],\
+                       [np.round(cm[1].astype(float)/cm.sum(axis=1)[1], 2)],axis=0)
+    tempCm = np.append(tempCm,
+                       [np.round(cm[2].astype(float)/cm.sum(axis=1)[2], 2)],axis=0)
+    cm=tempCm.copy()
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title, size=20)
+    plt.colorbar()
+    tick_marks = np.arange(3)
+    plt.xticks(tick_marks, ['drop', 'duplicate', 'tear'], rotation=45, size=20)
+    plt.yticks(tick_marks, ['drop', 'duplicate', 'tear'], size=20)
+    plt.tight_layout()
+    plt.ylabel('True label', size=20)
+    plt.xlabel('Predicted label', size=20)
+    ax = plt.gca()
+    ax.grid(False)
+    for i in range(3):
+        for j in range(3):
+            if cm[i][j] != 0:
+                ax.text(j, i, '{}\n({})'.format(cm[i][j], cmReal[i][j]), fontsize=15)
+    

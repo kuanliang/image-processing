@@ -1,4 +1,9 @@
 import os
+import re
+import random
+
+import pandas as pd
+import numpy as np
 
 def xlsToCsv(path):
     '''transform xls format file to csv format file
