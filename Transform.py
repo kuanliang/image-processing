@@ -158,7 +158,7 @@ def lineup(df, **kwargv):
     
     
     
-def create_ML_df(df):
+def create_ML_df(df, query=False):
     '''create dataframe for Machine Learning modeling
     
     Notes:
@@ -181,6 +181,14 @@ def create_ML_df(df):
                 record.columns = columns
                 record.index = ['{}_{}'.format(SN, i)]
                 dfList.append(record)
+            # if query == True:
+            # avg value was added and will also be transformed 
+            if query == True:
+                record = groupSN[1][['avg']].T
+                record.columns = columns
+                record.index = ['{}_avg'.format(SN)]
+                dfList.append(record)
+            
             tempDf = pd.concat(dfList)
 
             SNDfList.append(tempDf)
@@ -196,6 +204,20 @@ def addZDf(df):
     '''
     zDiffDf = create_zDf(df)
     return pd.concat([df, zDiffDf])
+    
+    
+def createQueryDf(combinedDf):
+    '''
+    '''
+    # add z metric
+    combinedZDf = addZDf(combinedDf)
+    
+    # add a 'avg' column
+    combinedZDf['avg'] = combinedZDf[['value{}'.format(i) for i in range(1,33)]].mean(axis=1)
+    # transform to mlDf
+    mlDf = create_ML_df(combinedZDf, query=True)
+
+    return mlDf[mlDf.index.str.contains('avg')]
     
 
 

@@ -126,8 +126,8 @@ def plot_confusion_matrix(true, predict, title='Confusion matrix', cmap=plt.cm.B
     
     cm = confusion_matrix(true, predict)
     cmReal = cm.copy()
-    cmRecall = np.around(cm.astype(float) / cm.sum(axis=0), 2)
-    cmPrecision = np.around(cm.astype(float) / cm.sum(axis=1), 2)
+    cmRecall = np.around(np.around(cm.astype(float) / cm.sum(axis=0), 2)*100,0).astype(int)
+    cmPrecision = np.around(np.around(cm.astype(float) / cm.sum(axis=1), 2)*100, 0).astype(int)
     cmF = (cmRecall * cmPrecision * 2) / (cmRecall + cmPrecision)
     
     # figure(figsize = (20, 20))
@@ -148,7 +148,7 @@ def plot_confusion_matrix(true, predict, title='Confusion matrix', cmap=plt.cm.B
     for i in range(3):
         for j in range(3):
             if cm[i][j] != 0:
-                ax.text(j, i, 'P:{},C:{}\n({})'.format(cmPrecision[i][j],\
+                ax.text(j, i, 'P:{}% R:{}%\n({})'.format(cmPrecision[i][j],\
                                                        cmRecall[i][j],\
                                                        cmReal[i][j]),\
                                                        fontsize=15,color='gray',\
