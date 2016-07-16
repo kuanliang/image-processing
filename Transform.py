@@ -207,7 +207,7 @@ def addZDf(df):
     
     
 def createQueryDf(combinedDf):
-    '''
+    '''create query df for machine learning task
     '''
     # add z metric
     combinedZDf = addZDf(combinedDf)
