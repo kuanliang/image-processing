@@ -13,7 +13,7 @@ import random
 import pandas as pd
 import numpy as np
 
-def logisticModeling(dfTrain, dfTest, random_state=0):
+def logisticModeling(dfTrain, dfTest, test=random_state=0):
     '''perform logistic regression
     
     Notes: 

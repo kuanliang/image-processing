@@ -200,22 +200,36 @@ def create_ML_df(df, query=False):
     return mlDf
 
 def addZDf(df):
-    '''return 
+    '''add metric Z to df
+    
+    Notes:
+    
+    
     '''
     zDiffDf = create_zDf(df)
     return pd.concat([df, zDiffDf])
     
     
-def createQueryDf(combinedDf):
+def createQueryDf(path, tag):
     '''create query df for machine learning task
-    '''
-    # add z metric
-    combinedZDf = addZDf(combinedDf)
     
+    Notes:
+    
+    Args:
+    
+    Return:
+    
+    '''
+    # combine csv files and transform to a df
+    combinedDf = combine_df(path, tag=tag)
+    # filter column 'status'
+    combinedDiffDf = combinedDf[combinedDf['status'].str.contains('diff')]
+    # add z metric
+    combinedDiffZDf = addZDf(combinedDiffDf)
     # add a 'avg' column
-    combinedZDf['avg'] = combinedZDf[['value{}'.format(i) for i in range(1,33)]].mean(axis=1)
+    combinedDiffZDf['avg'] = combinedDiffZDf[['value{}'.format(i) for i in range(1,33)]].mean(axis=1)
     # transform to mlDf
-    mlDf = create_ML_df(combinedZDf, query=True)
+    mlDf = create_ML_df(combinedDiffZDf, query=True)
 
     return mlDf[mlDf.index.str.contains('avg')]
     
