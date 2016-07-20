@@ -154,4 +154,33 @@ def plot_confusion_matrix(true, predict, title='Confusion matrix', cmap=plt.cm.B
                                                        fontsize=15,color='gray',\
                                                        horizontalalignment='center',\
                                                        verticalalignment='center',)
+                                                       
+
+def plot_probability(mlDf, predict_prob):
+    
+    N = len(predict_prob)
+    ind = np.arange(N)
+    width = 0.3
+    
+    probaDrop = predict_prob[:,0]
+    probaDup = predict_prob[:,1]
+    probaTear = predict_prob[:,2]
+    
+    fig, ax = plt.subplots(figsize=(20,8))
+    
+    rects1 = ax.bar(ind, probaDup, width, color='g', alpha=0.6)
+    rects2 = ax.bar(ind+width, probaDrop, width, color='b', alpha=0.6)
+    rects3 = ax.bar(ind+width+width, probaTear, width, color='r', alpha=0.6)
+    
+    # add some text for labels, title and axes ticks
+    ax.set_ylabel('Probability', fontsize=20)
+    ax.set_title('Probability by cases', fontsize=20)
+    ax.set_xticks(ind + width + width)
+    ax.set_xticklabels([x.replace('_avg', '') for x in mlDf.index], fontsize=20)
+    
+    ax.legend((rects1[0], rects2[0], rects3[0]), ('Normal', 'Drop', 'Tear'), fontsize=20)
+    
+    plt.xticks(rotation='vertical')
+    # plt.figure(figsize=(10,5))
+    plt.show()
     

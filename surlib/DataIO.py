@@ -10,7 +10,7 @@ def csvToDf(path, sep='\t'):
     Notes: 
     
     Args:
-        path:
+        path: 
         sep: 
     
     Return: a list containing dataframe extracted from csv files
@@ -50,7 +50,7 @@ def dump_model(model, col, path='./model/'):
     filePath = path + '/' + fileName
     fileDump = open(filePath, 'wb')
     # dump the file
-    pickle.dump(model, fileDump)
+    pickle.dump((model, col), fileDump)
     fileDump.close()
 
 def load_model(path):
