@@ -184,3 +184,38 @@ def plot_probability(mlDf, predict_prob):
     # plt.figure(figsize=(10,5))
     plt.show()
     
+    
+def plot_deform_ratio(df):
+    '''plot deformation bar chart
+    
+    Notes:
+    
+    Args: the deformation ratio of 4 sides on images (UP, DOWN, LEFT, RIGHT) 
+    
+    Return: None
+    
+    Print SNs with deformation larger than 0.2
+    Boxplot
+    '''
+    N = len(df)
+    
+    ind = np.arange(N)
+    width = 0.3
+    
+    fig, ax = plt.subplots(figsize=(20,8))
+    rectsUp = ax.bar(ind, df['UP'], width, color='b', alpha=0.7)
+    rectsDown = ax.bar(ind + width, df['DOWN'], width, color='g', alpha=0.7)
+    # rectsLeft = ax.bar(ind + width + width, df['LEFT'], width, color='gray', alpha=0.7)
+    # rectsRight = ax.bar(ind + width + width + width, df['RIGHT'], width, color='yellow', alpha=0.7)
+    ax.legend((rectsUp[0], rectsDown[0]), ('UP', 'DOWN'), fontsize=20)
+    ax.set_ylabel('Deformation Ratio', fontsize=20)
+    ax.set_title('Deformation Ration of SNs', fontsize=20)
+    ax.set_xticks(ind + width)
+    xticklabels = [SN if (abs(diffFilteredDf.loc[SN]['UP']) > 0.2 or abs(diffFilteredDf.loc[SN]['DOWN']) > 0.2)\
+                        else '' for SN in diffFilteredDf.index]
+    ax.set_xticklabels(xticklabels, rotation=90, fontsize=20)
+    plt.show()
+    for sn in xticklabels:
+        if sn != '':
+            print sn
+    
