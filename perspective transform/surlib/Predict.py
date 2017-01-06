@@ -26,4 +26,4 @@ def predict_query(mlDf, model, column, plot=False):
     
     plot_probability(mlDf, predict_prob)
     
-    return predict
+    return predict, predict_prob
